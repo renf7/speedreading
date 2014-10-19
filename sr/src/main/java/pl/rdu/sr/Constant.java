@@ -33,4 +33,9 @@ public interface Constant {
      * Czciąka nagłówka.
      */
     Font HEADER_FONT = Font.font("Tahoma", FontWeight.NORMAL, 20);
+    
+    /**
+     * Ułamek jaki nanosakundy stanowią milisekundy.
+     */
+    int MILIS_NANOS_FRACTION = 1000000;
 }

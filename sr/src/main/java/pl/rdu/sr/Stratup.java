@@ -24,7 +24,7 @@ public final class Stratup extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        primaryStage.setTitle(MSG_APPLICATION_WINDOW_TITLE.toString());
+        primaryStage.setTitle(MSG_APPLICATION_WINDOW_TITLE.getMsg());
         WorldCheckerView wcv = CTX.get().getBean(WorldCheckerView.class);
         
         Scene scene = new Scene(wcv.getParent(), 300, 275);
@@ -32,5 +32,4 @@ public final class Stratup extends Application {
         primaryStage.show();
         
     }
-
 }

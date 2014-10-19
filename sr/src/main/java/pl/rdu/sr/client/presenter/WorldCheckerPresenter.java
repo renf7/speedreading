@@ -3,6 +3,7 @@ package pl.rdu.sr.client.presenter;
 import static javafx.scene.paint.Color.FIREBRICK;
 import static javafx.scene.paint.Color.GREEN;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static pl.rdu.sr.Constant.MILIS_NANOS_FRACTION;
 import static pl.rdu.sr.EnumMsg.ERR_WORDCHECKER_WRONGGIVENWORLD;
 import static pl.rdu.sr.EnumMsg.MSG_WORDCHECK_BUTTON_CHECK;
 import static pl.rdu.sr.EnumMsg.MSG_WORDCHECK_BUTTON_START;
@@ -19,6 +20,7 @@ import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import pl.rdu.sr.bo.impl.EnglishWorldBOImpl;
@@ -29,13 +31,21 @@ import pl.rdu.sr.client.view.WorldCheckerView;
 @SuppressWarnings("restriction")
 public class WorldCheckerPresenter extends AbstractPresenter<WorldCheckerView, WorldCheckerModel> {
     private static final Logger LOG = LoggerFactory.getLogger(WorldCheckerPresenter.class);
-    private static final float WAIT_FACTOR_SUCCES = 1.1f;
-    private static final float WAIT_FACTOR_FAIL = 0.9f;
             
     @Autowired
     private EnglishWorldBOImpl englishWorldBOImpl;
+
+    @Value("${WorldCheckerPresenter.snapshotFactorSuccess.default}")
+    private float snapshotFactorSuccess;
     
+    @Value("${WorldCheckerPresenter.snapshotFactorFail.default}")
+    private float snapshotFactorFail;
+    
+    @Value("${WorldCheckerPresenter.snapshotPerCharTime.default}")
     private long snapshotPerCharTime;
+    
+    @Value("${WorldCheckerPresenter.betweenSnaphotWaitTime.default}")
+    private long betweenSnaphotWaitTime;
     
     @PostConstruct
     public void init() {
@@ -44,6 +54,7 @@ public class WorldCheckerPresenter extends AbstractPresenter<WorldCheckerView, W
     }
     
     EventHandler<ActionEvent> checkWorldAction = new EventHandler<ActionEvent>() {
+
         @Override
         public void handle(javafx.event.ActionEvent event) {
             String btnMsgExpected = MSG_WORDCHECK_BUTTON_CHECK.getMsg();
@@ -59,12 +70,13 @@ public class WorldCheckerPresenter extends AbstractPresenter<WorldCheckerView, W
             String givenNewWord;
             long snapshotTime;
             if (success) {
+                sleep(betweenSnaphotWaitTime, 0);
                 givenNewWord = englishWorldBOImpl.getRandomWord();
                 v.getGivenWord().setText(givenNewWord);
-                snapshotTime = calculateWaitTime(WAIT_FACTOR_SUCCES, givenNewWord);
+                snapshotTime = calculateWaitTime(snapshotFactorSuccess, givenNewWord);
             } else {
                 givenNewWord = v.getGivenWord().getText();
-                snapshotTime = calculateWaitTime(WAIT_FACTOR_FAIL, givenNewWord);
+                snapshotTime = calculateWaitTime(snapshotFactorFail, givenNewWord);
             }
             
             doWordSnapshot(snapshotTime);
@@ -100,28 +112,32 @@ public class WorldCheckerPresenter extends AbstractPresenter<WorldCheckerView, W
         private long calculateWaitTime(float factor, String givenNewWord) {
             long ret = snapshotPerCharTime;
             
-            if (snapshotPerCharTime <= 0) {
-                snapshotPerCharTime = 100L;
-            } else {
-                snapshotPerCharTime *= factor;
+            snapshotPerCharTime *= factor;
+            
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("snapshotPerCharTime " + ret / MILIS_NANOS_FRACTION + " ms word length: "
+                        + givenNewWord.length());
             }
             
             ret = snapshotPerCharTime * givenNewWord.length();
             return ret;
         }
 
-        private void doWordSnapshot(final long waitTimeMs) {
+        private void doWordSnapshot(final long waitTimeNs) {
+            final int nanos = (int) (waitTimeNs % MILIS_NANOS_FRACTION);
+            final long millis = waitTimeNs / MILIS_NANOS_FRACTION;
+
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("waitTime: " + millis + " ms");
+            }
+            
             new Thread(new Task<Void>() {
                 
                 @Override 
                 public Void call() {
                     Platform.runLater(() ->  v.getGivenWord().setStyle(FX_CSS_TEXTFIELD_COLOR_BLACK));
                     
-                    try {
-                        Thread.sleep(waitTimeMs);
-                    } catch (InterruptedException ex) {
-                        LOG.error("wait interruption", ex);
-                    }
+                    sleep(millis, nanos);
                     
                     Platform.runLater(() ->  v.getGivenWord().setStyle(FX_CSS_TEXTFIELD_COLOR_WHITE));
                     
@@ -131,4 +147,12 @@ public class WorldCheckerPresenter extends AbstractPresenter<WorldCheckerView, W
         }
     };
 
+
+    private void sleep(long millis, int nanos) {
+        try {
+            Thread.sleep(millis, nanos);
+        } catch (InterruptedException ex) {
+            LOG.error("wait interruption", ex);
+        }
+    }
 }

@@ -10,14 +10,6 @@
     <context:component-scan base-package="pl.rdu.sr.bo"/>
     <context:component-scan base-package="pl.rdu.sr.client"/>
     
-    <bean id="messageSource"
-        class="org.springframework.context.support.ResourceBundleMessageSource">
-        <property name="basenames">
-            <array>
-                <value>locale\msg</value>
-                <value>locale\err</value>
-            </array>
-        </property>
-    </bean>
+    <context:property-placeholder location="classpath:conf.properties"/>
     
 </beans>
