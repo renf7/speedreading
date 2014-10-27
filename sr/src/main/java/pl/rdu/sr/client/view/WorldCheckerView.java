@@ -37,7 +37,6 @@ public class WorldCheckerView extends AbstractView {
     
     @PostConstruct
     public void init() {
-        
         parent.setAlignment(Pos.CENTER);
         parent.setHgap(10);
         parent.setVgap(10);
