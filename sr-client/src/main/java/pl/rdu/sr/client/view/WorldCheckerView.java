@@ -1,10 +1,10 @@
 package pl.rdu.sr.client.view;
 import static javafx.geometry.HPos.RIGHT;
-import static pl.rdu.sr.Constant.HEADER_FONT;
-import static pl.rdu.sr.EnumMsg.MSG_WORDCHECK_BUTTON_START;
-import static pl.rdu.sr.EnumMsg.MSG_WORDCHECK_LABEL_SNAPSHOT_WORD;
-import static pl.rdu.sr.EnumMsg.MSG_WORDCHECK_LABEL_USER_WORD;
-import static pl.rdu.sr.EnumMsg.MSG_WORDCHECK_SCENETITLE;
+import static pl.rdu.sr.bc.Constant.HEADER_FONT;
+import static pl.rdu.sr.bc.EnumMsg.MSG_WORDCHECK_BUTTON_START;
+import static pl.rdu.sr.bc.EnumMsg.MSG_WORDCHECK_LABEL_SNAPSHOT_WORD;
+import static pl.rdu.sr.bc.EnumMsg.MSG_WORDCHECK_LABEL_USER_WORD;
+import static pl.rdu.sr.bc.EnumMsg.MSG_WORDCHECK_SCENETITLE;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;

@@ -1,4 +1,4 @@
-package pl.rdu.sr.bo;
+package pl.rdu.sr.bc.bo;
 
 /**
  * Interfejs do klasy zarządzającej angielskimi słowami.

@@ -1,6 +1,6 @@
-package pl.rdu.sr.bo.impl;
+package pl.rdu.sr.bc.bo.impl;
 
-import static pl.rdu.sr.Constant.ENG_WORDS_FILE;
+import static pl.rdu.sr.bc.Constant.ENG_WORDS_FILE;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import pl.rdu.sr.bo.EnglishWorldBO;
+import pl.rdu.sr.bc.bo.EnglishWorldBO;
 
 /**
  * Klasa do zarządzania angielskimi słowami.

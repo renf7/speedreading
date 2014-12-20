@@ -1,4 +1,4 @@
-package pl.rdu.sr.model;
+package pl.rdu.sr.model.ds;
 
 /**
  * Entity to hold information about snapshots.

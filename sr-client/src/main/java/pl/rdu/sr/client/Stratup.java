@@ -1,7 +1,7 @@
-package pl.rdu.sr;
+package pl.rdu.sr.client;
 
-import static pl.rdu.sr.EnumMsg.MSG_APPLICATION_WINDOW_TITLE;
-import static pl.rdu.sr.EnumSpringCtx.CTX;
+import static pl.rdu.sr.bc.EnumMsg.MSG_APPLICATION_WINDOW_TITLE;
+import static pl.rdu.sr.client.EnumSpringCtx.CTX;
 
 import java.io.IOException;
 
@@ -24,8 +24,8 @@ public final class Stratup extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        primaryStage.setTitle(MSG_APPLICATION_WINDOW_TITLE.getMsg());
         WorldCheckerView wcv = CTX.get().getBean(WorldCheckerView.class);
+        primaryStage.setTitle(MSG_APPLICATION_WINDOW_TITLE.getMsg());
         
         Scene scene = new Scene(wcv.getParent(), 300, 275);
         primaryStage.setScene(scene);

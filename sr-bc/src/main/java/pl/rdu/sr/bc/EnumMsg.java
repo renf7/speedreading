@@ -1,7 +1,7 @@
-package pl.rdu.sr;
-import static pl.rdu.sr.EnumSpringCtx.CTX_MSG;
-
+package pl.rdu.sr.bc;
 import java.util.Locale;
+
+import org.springframework.context.MessageSource;
 
 public enum EnumMsg {
     MSG_APPLICATION_WINDOW_TITLE,
@@ -16,12 +16,17 @@ public enum EnumMsg {
     ERR_WORDCHECKER_WRONGGIVENWORLD,
     ;
     
+    private static MessageSource ms;
+    
+    public static void init(MessageSource ms) {
+        EnumMsg.ms = ms;
+    }
     
     public String getMsg(Object ...params) {
         return getMsg(Locale.getDefault(), params);
     }
     
     public String getMsg(Locale locale, Object... params) {
-        return CTX_MSG.get().getMessage(super.toString(), params, locale);
+        return ms.getMessage(super.toString(), params, locale);
     }
 }

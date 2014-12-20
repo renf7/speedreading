@@ -1,4 +1,4 @@
-package pl.rdu.sr;
+package pl.rdu.sr.bc;
 
 import java.nio.charset.Charset;
 

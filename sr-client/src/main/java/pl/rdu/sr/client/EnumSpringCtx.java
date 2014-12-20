@@ -1,4 +1,4 @@
-package pl.rdu.sr;
+package pl.rdu.sr.client;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -10,7 +10,8 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  */
 public enum EnumSpringCtx {
     CTX_MSG(null, "classpath:config/sr-msg.xml"),
-    CTX(CTX_MSG, "classpath:config/sr-client.xml");
+    CTX_BC(CTX_MSG, "classpath:config/sr-bc.xml"),
+    CTX(CTX_BC, "classpath:config/sr-client.xml");
 
     private ApplicationContext ctx;
 

@@ -3,11 +3,11 @@ package pl.rdu.sr.client.presenter;
 import static javafx.scene.paint.Color.FIREBRICK;
 import static javafx.scene.paint.Color.GREEN;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static pl.rdu.sr.Constant.MILIS_NANOS_FRACTION;
-import static pl.rdu.sr.EnumMsg.ERR_WORDCHECKER_WRONGGIVENWORLD;
-import static pl.rdu.sr.EnumMsg.MSG_WORDCHECK_BUTTON_CHECK;
-import static pl.rdu.sr.EnumMsg.MSG_WORDCHECK_BUTTON_START;
-import static pl.rdu.sr.EnumMsg.MSG_WORDCHECK_LABEL_CORRECT_WORD;
+import static pl.rdu.sr.bc.Constant.MILIS_NANOS_FRACTION;
+import static pl.rdu.sr.bc.EnumMsg.ERR_WORDCHECKER_WRONGGIVENWORLD;
+import static pl.rdu.sr.bc.EnumMsg.MSG_WORDCHECK_BUTTON_CHECK;
+import static pl.rdu.sr.bc.EnumMsg.MSG_WORDCHECK_BUTTON_START;
+import static pl.rdu.sr.bc.EnumMsg.MSG_WORDCHECK_LABEL_CORRECT_WORD;
 import static pl.rdu.sr.client.view.WorldCheckerView.FX_CSS_TEXTFIELD_COLOR_BLACK;
 import static pl.rdu.sr.client.view.WorldCheckerView.FX_CSS_TEXTFIELD_COLOR_WHITE;
 import javafx.application.Platform;
@@ -23,7 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import pl.rdu.sr.bo.impl.EnglishWorldBOImpl;
+import pl.rdu.sr.bc.bo.impl.EnglishWorldBOImpl;
 import pl.rdu.sr.client.model.WorldCheckerModel;
 import pl.rdu.sr.client.view.WorldCheckerView;
 
@@ -53,9 +53,7 @@ public class WorldCheckerPresenter extends AbstractPresenter<WorldCheckerView, W
         v.getUserWord().setOnAction(checkWorldAction);
     }
     
-    EventHandler<ActionEvent> checkWorldAction = new EventHandler<ActionEvent>() {
-
-        @Override
+    private EventHandler<ActionEvent> checkWorldAction = new EventHandler<ActionEvent>() {
         public void handle(javafx.event.ActionEvent event) {
             String btnMsgExpected = MSG_WORDCHECK_BUTTON_CHECK.getMsg();
             String btnMsgActual = v.getBtn().getText();
