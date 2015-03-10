@@ -10,6 +10,9 @@ import static pl.rdu.sr.bc.EnumMsg.MSG_WORDCHECK_BUTTON_START;
 import static pl.rdu.sr.bc.EnumMsg.MSG_WORDCHECK_LABEL_CORRECT_WORD;
 import static pl.rdu.sr.client.view.WorldCheckerView.FX_CSS_TEXTFIELD_COLOR_BLACK;
 import static pl.rdu.sr.client.view.WorldCheckerView.FX_CSS_TEXTFIELD_COLOR_WHITE;
+
+import java.util.concurrent.Semaphore;
+
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -47,10 +50,24 @@ public class WorldCheckerPresenter extends AbstractPresenter<WorldCheckerView, W
     @Value("${WorldCheckerPresenter.betweenSnaphotWaitTime.default}")
     private long betweenSnaphotWaitTime;
     
+    private Semaphore sem = new Semaphore(1);
+    
+    private State state = State.FIRST_RUN;
+    private enum State {
+        FIRST_RUN, CHECK;
+    }
+    
     @PostConstruct
     public void init() {
         v.getBtn().setOnAction(checkWorldAction);
         v.getUserWord().setOnAction(checkWorldAction);
+        
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                v.getUserWord().requestFocus();
+            }
+        });
     }
     
     private EventHandler<ActionEvent> checkWorldAction = new EventHandler<ActionEvent>() {
@@ -58,23 +75,31 @@ public class WorldCheckerPresenter extends AbstractPresenter<WorldCheckerView, W
             String btnMsgExpected = MSG_WORDCHECK_BUTTON_CHECK.getMsg();
             String btnMsgActual = v.getBtn().getText();
             
-            boolean success = true;
             if (!btnMsgExpected.equals(btnMsgActual)) {
                 changeButtonTextToExpected(btnMsgExpected, btnMsgActual);
             } else {
-                success = checkWord();
+                state = State.CHECK;
             }
             
             String givenNewWord;
             long snapshotTime;
-            if (success) {
+            if (checkWord()) {
                 sleep(betweenSnaphotWaitTime, 0);
                 givenNewWord = englishWorldBOImpl.getRandomWord();
                 v.getGivenWord().setText(givenNewWord);
                 snapshotTime = calculateWaitTime(snapshotFactorSuccess, givenNewWord);
+                
+                if (state == State.CHECK) {
+                    v.getUserWord().setText(EMPTY);
+                    v.getActiontarget().setFill(GREEN);
+                    v.getActiontarget().setText(MSG_WORDCHECK_LABEL_CORRECT_WORD.getMsg(snapshotPerCharTime / MILIS_NANOS_FRACTION));
+                }
             } else {
                 givenNewWord = v.getGivenWord().getText();
                 snapshotTime = calculateWaitTime(snapshotFactorFail, givenNewWord);
+                
+                v.getActiontarget().setFill(FIREBRICK);
+                v.getActiontarget().setText(ERR_WORDCHECKER_WRONGGIVENWORLD.getMsg(snapshotPerCharTime / MILIS_NANOS_FRACTION));
             }
             
             doWordSnapshot(snapshotTime);
@@ -93,18 +118,7 @@ public class WorldCheckerPresenter extends AbstractPresenter<WorldCheckerView, W
         private boolean checkWord() {
             String userWord = v.getUserWord().getText();
             
-            if (userWord.equals(v.getGivenWord().getText())) {
-                v.getUserWord().setText(EMPTY);
-                v.getActiontarget().setFill(GREEN);
-                v.getActiontarget().setText(MSG_WORDCHECK_LABEL_CORRECT_WORD.getMsg());
-                
-                return true;
-            } else {
-                v.getActiontarget().setFill(FIREBRICK);
-                v.getActiontarget().setText(ERR_WORDCHECKER_WRONGGIVENWORLD.getMsg(userWord));
-                
-                return false;
-            }
+            return userWord.equals(v.getGivenWord().getText());
         }
 
         private long calculateWaitTime(float factor, String givenNewWord) {
@@ -129,6 +143,12 @@ public class WorldCheckerPresenter extends AbstractPresenter<WorldCheckerView, W
                 LOG.debug("waitTime: " + millis + " ms");
             }
             
+            try {
+                sem.acquire();
+            } catch (InterruptedException e) {
+                LOG.debug("sem acquire interrupted", e);
+            }
+            
             new Thread(new Task<Void>() {
                 
                 @Override 
@@ -138,6 +158,8 @@ public class WorldCheckerPresenter extends AbstractPresenter<WorldCheckerView, W
                     sleep(millis, nanos);
                     
                     Platform.runLater(() ->  v.getGivenWord().setStyle(FX_CSS_TEXTFIELD_COLOR_WHITE));
+                    
+                    sem.release();
                     
                     return null;
                 }
